@@ -1,0 +1,44 @@
+{
+  "topics": {
+    "title": "Chọn Chủ Đề",
+    "selectAll": "Chọn Tất Cả",
+    "clear": "Bỏ Chọn",
+    "selected": "chủ đề đã chọn",
+    "startQuiz": "Bắt Đầu Quiz"
+  },
+  "quiz": {
+    "progress": "Câu {current} / {total}",
+    "correct": "Đúng!",
+    "wrong": "Sai",
+    "next": "Câu Tiếp Theo",
+    "finish": "Kết Thúc Quiz",
+    "explanation": "Giải thích"
+  },
+  "missed": {
+    "title": "Câu Hỏi Cần Ôn Tập",
+    "empty": "Không có câu nào sai! Tuyệt vời!",
+    "retry": "Luyện Lại",
+    "yourAnswer": "Đáp án của bạn",
+    "correctAnswer": "Đáp án đúng"
+  },
+  "progress": {
+    "title": "Tiến Độ Học Tập",
+    "junior": "Sơ Cấp",
+    "middle": "Trung Cấp",
+    "senior": "Cao Cấp",
+    "mastered": "đã thành thạo"
+  },
+  "level": {
+    "JUNIOR": "Sơ Cấp",
+    "MIDDLE": "Trung Cấp",
+    "SENIOR": "Cao Cấp"
+  },
+  "complete": {
+    "title": "Hoàn Thành!",
+    "correct": "Đúng",
+    "wrong": "Sai",
+    "reviewMissed": "Xem Câu Sai",
+    "backToTopics": "Quay Lại"
+  },
+  "streak": "Ngày Liên Tục"
+}

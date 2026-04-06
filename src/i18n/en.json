@@ -1,0 +1,44 @@
+{
+  "topics": {
+    "title": "Choose Topics",
+    "selectAll": "Select All",
+    "clear": "Clear",
+    "selected": "topics selected",
+    "startQuiz": "Start Quiz"
+  },
+  "quiz": {
+    "progress": "Q {current} of {total}",
+    "correct": "Correct!",
+    "wrong": "Incorrect",
+    "next": "Next Question",
+    "finish": "Finish Quiz",
+    "explanation": "Explanation"
+  },
+  "missed": {
+    "title": "Questions to Review",
+    "empty": "No missed questions! Great job!",
+    "retry": "Retry",
+    "yourAnswer": "Your answer",
+    "correctAnswer": "Correct answer"
+  },
+  "progress": {
+    "title": "Your Progress",
+    "junior": "Junior",
+    "middle": "Middle",
+    "senior": "Senior",
+    "mastered": "mastered"
+  },
+  "level": {
+    "JUNIOR": "Junior",
+    "MIDDLE": "Middle",
+    "SENIOR": "Senior"
+  },
+  "complete": {
+    "title": "Session Complete!",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "reviewMissed": "Review Missed",
+    "backToTopics": "Back to Topics"
+  },
+  "streak": "Day Streak"
+}
