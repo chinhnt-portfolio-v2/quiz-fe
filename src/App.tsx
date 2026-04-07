@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/layout/protected-route';
 import QuizTopicSelectionPage from './pages/quiz-topic-selection-page';
 import QuizCardPage from './pages/quiz-card-page';
@@ -8,6 +8,7 @@ import QuizProgressPage from './pages/quiz-progress-dashboard-page';
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/quiz" replace />} />
       <Route path="/quiz" element={<QuizTopicSelectionPage />} />
       <Route
         path="/quiz/practice"
