@@ -32,8 +32,8 @@ export default function LoginPage() {
   }, [navigate]);
 
   const handleGoogleLogin = () => {
-    const quizOrigin = window.location.origin;
-    const callbackRedirect = `${quizOrigin}/login`;
+    // Encode the quiz app login URL as redirect_uri so BE redirects back here after OAuth
+    const callbackRedirect = `${window.location.origin}/login`;
     window.location.href = `${
       import.meta.env.VITE_API_BASE_URL ?? 'https://portfolio-platform-1095331155372.asia-southeast1.run.app/api/v1'
     }/auth/oauth2/login/google?redirect_uri=${encodeURIComponent(callbackRedirect)}`;
