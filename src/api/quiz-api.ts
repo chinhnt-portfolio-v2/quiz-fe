@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'https://portfolio-platform-1095331155372.asia-southeast1.run.app',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'https://portfolio-platform-1095331155372.asia-southeast1.run.app/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
