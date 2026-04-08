@@ -8,8 +8,13 @@ interface QuizSessionStore {
   correctCount: number;
   wrongCount: number;
   completedQuestions: CompletedQuestion[];
+  /** Incremented on each "Next" click — drives React Query fetch. */
+  fetchCounter: number;
+  totalFetched: number;
+  noMoreQuestions: boolean;
 
-  setQueue: (questions: QuizQuestion[]) => void;
+  addQuestion: (q: QuizQuestion) => void;
+  setNoMoreQuestions: () => void;
   recordAnswer: (response: AttemptAnswerResponse) => void;
   nextQuestion: () => void;
   isSessionComplete: () => boolean;
@@ -28,15 +33,17 @@ export const useQuizSessionStore = create<QuizSessionStore>((set, get) => ({
   correctCount: 0,
   wrongCount: 0,
   completedQuestions: [],
+  fetchCounter: 0,
+  totalFetched: 0,
+  noMoreQuestions: false,
 
-  setQueue: (questions) => set({
-    questionQueue: questions,
-    currentIndex: 0,
-    answeredCount: 0,
-    correctCount: 0,
-    wrongCount: 0,
-    completedQuestions: [],
-  }),
+  addQuestion: (q) => set(s => ({
+    questionQueue: [...s.questionQueue, q],
+    totalFetched: s.totalFetched + 1,
+    noMoreQuestions: false,
+  })),
+
+  setNoMoreQuestions: () => set({ noMoreQuestions: true }),
 
   recordAnswer: (response) => {
     const { currentIndex, questionQueue, correctCount, wrongCount } = get();
@@ -50,11 +57,13 @@ export const useQuizSessionStore = create<QuizSessionStore>((set, get) => ({
     });
   },
 
-  nextQuestion: () => set(s => ({ currentIndex: s.currentIndex + 1 })),
+  // Bumps fetchCounter ONLY — no longer touches sessionId.
+  // React Query watches fetchCounter for its query key.
+  nextQuestion: () => set(s => ({ currentIndex: s.currentIndex + 1, fetchCounter: s.fetchCounter + 1 })),
 
   isSessionComplete: () => {
-    const { currentIndex, questionQueue } = get();
-    return currentIndex >= questionQueue.length;
+    const { noMoreQuestions, totalFetched } = get();
+    return noMoreQuestions && totalFetched >= 1;
   },
 
   resetSession: () => set({
@@ -64,5 +73,8 @@ export const useQuizSessionStore = create<QuizSessionStore>((set, get) => ({
     correctCount: 0,
     wrongCount: 0,
     completedQuestions: [],
+    fetchCounter: 0,
+    totalFetched: 0,
+    noMoreQuestions: false,
   }),
 }));

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuizSessionStore } from '@/stores/quiz-session-store';
 import { useNextQuestion, useSubmitAnswer } from './use-quiz';
@@ -9,23 +9,38 @@ export function useQuizSession() {
 
   const {
     questionQueue, currentIndex, correctCount, wrongCount,
-    setQueue, recordAnswer, nextQuestion, isSessionComplete, resetSession
+    addQuestion, recordAnswer, nextQuestion, isSessionComplete, resetSession,
+    fetchCounter, totalFetched, setNoMoreQuestions,
   } = useQuizSessionStore();
 
-  const { data: nextQuestionData } = useNextQuestion(topics);
+  // fetchCounter increments on "Next" → React Query fires a new fetch.
+  // Pass answered question IDs so BE can exclude them (avoids tx-timing duplicate).
+  const answeredIds = questionQueue.map(q => q.id);
+  const { data: nextQuestionData, error: nextQuestionError, isError } = useNextQuestion(topics, fetchCounter, answeredIds);
   const submitAnswer = useSubmitAnswer();
 
   const currentQuestion = questionQueue[currentIndex] ?? null;
   const isComplete = isSessionComplete();
-  const totalAnswered = correctCount + wrongCount;
 
-  const loadMore = useCallback(() => {
-    if (nextQuestionData) {
-      // Read latest queue via get() to avoid stale closure
-      const latestQueue = useQuizSessionStore.getState().questionQueue;
-      setQueue([...latestQueue, nextQuestionData]);
+  // Add newly arrived question to the queue.
+  useEffect(() => {
+    if (!nextQuestionData) return;
+    const queue = useQuizSessionStore.getState().questionQueue;
+    if (!queue.some(q => q.id === nextQuestionData.id)) {
+      addQuestion(nextQuestionData);
     }
-  }, [nextQuestionData, setQueue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextQuestionData]);
+
+  // Backend returned 404 = no more questions for this topic → end session.
+  useEffect(() => {
+    if (!isError || !nextQuestionError) return;
+    const err = nextQuestionError as { response?: { status?: number } };
+    if (err?.response?.status === 404) {
+      setNoMoreQuestions();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError, nextQuestionError]);
 
   const handleAnswer = useCallback(async (givenKey: string) => {
     if (!currentQuestion) return;
@@ -41,15 +56,14 @@ export function useQuizSession() {
     topics,
     currentQuestion,
     questionIndex: currentIndex,
-    totalQuestions: questionQueue.length,
+    totalQuestions: totalFetched,
     correctCount,
     wrongCount,
     isComplete,
-    totalAnswered,
+    totalAnswered: correctCount + wrongCount,
     isSubmitting: submitAnswer.isPending,
     handleAnswer,
     nextQuestion,
     resetSession,
-    loadMore,
   };
 }

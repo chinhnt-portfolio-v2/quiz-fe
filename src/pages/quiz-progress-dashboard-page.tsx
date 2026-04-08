@@ -81,19 +81,17 @@ export default function QuizProgressPage() {
 
               <div className="space-y-3">
                 {(['junior', 'middle', 'senior'] as const).map(level => {
-                  const rawCount = topic.coverage[level] as number;
-                  const pct = topic.questionCount > 0
-                    ? Math.min(100, Math.round((rawCount / topic.questionCount) * 100))
-                    : 0;
+                  // coverage[level] is 0.0–1.0 from backend → multiply by 100 for %
+                  const coveragePct = Math.round((topic.coverage[level] ?? 0) * 100);
                   return (
                     <div key={level} className="space-y-1.5">
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>{t(`progress.${level}`)}</span>
-                        <span>{pct}%</span>
+                        <span>{coveragePct}%</span>
                       </div>
                       <CoverageBar
-                        value={rawCount}
-                        max={topic.questionCount}
+                        value={coveragePct}
+                        max={100}
                         color={
                           level === 'senior' ? 'bg-emerald-500' :
                           level === 'middle' ? 'bg-amber-500' :

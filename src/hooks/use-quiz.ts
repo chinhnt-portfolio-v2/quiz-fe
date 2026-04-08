@@ -13,11 +13,20 @@ export function useTopics() {
   return useQuery({ queryKey: QUIZ_KEYS.topics, queryFn: quizApi.getTopics });
 }
 
-export function useNextQuestion(topics: string[]) {
+export function useNextQuestion(topics: string[], fetchCounter = 0, exclude?: number[]) {
   return useQuery({
-    queryKey: QUIZ_KEYS.nextQuestion(topics),
-    queryFn: () => quizApi.getNextQuestion(topics, 1),
+    queryKey: [...QUIZ_KEYS.nextQuestion(topics), fetchCounter],
+    queryFn: () => quizApi.getNextQuestion(topics, 1, exclude),
     enabled: topics.length > 0,
+    placeholderData: (prev) => prev,
+    // 404 means backend has no more questions for this topic → end session
+    retry: (failureCount, err) => {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const res = (err as { response?: { status?: number } }).response;
+        if (res?.status === 404) return false; // don't retry on "no more questions"
+      }
+      return failureCount < 2;
+    },
   });
 }
 

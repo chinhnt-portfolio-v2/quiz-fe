@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTopics } from '@/hooks/use-quiz';
 import { SPRING_SNAPPY } from '@/constants/quiz-motion';
 
@@ -60,35 +60,57 @@ export default function QuizTopicSelectionPage() {
             <div className="col-span-2 flex flex-col items-center gap-3 py-12 text-center">
               <p className="text-muted-foreground">No topics found.</p>
             </div>
-          ) : topics.map(topic => (
-            <motion.button
-              key={topic.topicSlug}
-              whileTap={{ scale: 0.97 }}
-              transition={SPRING_SNAPPY}
-              onClick={() => toggleTopic(topic.topicSlug)}
-              className={`
-                relative flex flex-col items-start gap-1 rounded-xl border-2 p-4 text-left transition-colors
-                min-h-[80px]
-                ${selected.has(topic.topicSlug)
-                  ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-border bg-card text-foreground hover:border-primary/50'}
-              `}
-            >
-              <span className="font-semibold text-sm leading-tight">{topic.topicLabel}</span>
-              <span className="text-xs text-muted-foreground">
-                {topic.questionCount} questions
-              </span>
-              {/* Level badge */}
-              <span className={`
-                absolute right-2 top-2 text-[10px] font-mono px-1.5 py-0.5 rounded
-                ${topic.userLevel === 'SENIOR' ? 'bg-emerald-100 text-emerald-700' :
-                  topic.userLevel === 'MIDDLE' ? 'bg-amber-100 text-amber-700' :
-                  'bg-slate-100 text-slate-600'}
-              `}>
-                {topic.userLevel}
-              </span>
-            </motion.button>
-          ))}
+          ) : topics.map(topic => {
+            const isSelected = selected.has(topic.topicSlug);
+            return (
+              <motion.button
+                key={topic.topicSlug}
+                whileTap={{ scale: 0.97 }}
+                transition={SPRING_SNAPPY}
+                onClick={() => toggleTopic(topic.topicSlug)}
+                className={`
+                  relative flex flex-col rounded-xl border-2 p-4 text-left transition-all min-h-[80px]
+                  ${isSelected
+                    ? 'border-primary bg-primary/5 text-primary ring-2 ring-primary/30 shadow-sm'
+                    : 'border-border bg-card text-foreground hover:border-primary/50'}
+                `}
+              >
+                {/* Selected checkmark — top-left corner */}
+                <AnimatePresence>
+                  {isSelected && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                      className="absolute top-2 left-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center z-10 shadow-sm"
+                    >
+                      <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 6l3 3 5-5" />
+                      </svg>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <span className={`font-semibold text-sm leading-tight ${isSelected ? 'pt-5' : ''}`}>
+                  {topic.topicLabel}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {topic.questionCount} questions
+                </span>
+
+                {/* Level badge — bottom-right */}
+                <span className={`
+                  absolute right-2 bottom-2 text-[10px] font-mono px-1.5 py-0.5 rounded
+                  ${topic.userLevel === 'SENIOR' ? 'bg-emerald-100 text-emerald-700' :
+                    topic.userLevel === 'MIDDLE' ? 'bg-amber-100 text-amber-700' :
+                    'bg-slate-100 text-slate-600'}
+                `}>
+                  {topic.userLevel}
+                </span>
+              </motion.button>
+            );
+          })}
         </div>
 
         {/* Streak */}

@@ -7,9 +7,9 @@ import type {
 export const quizApi = {
   getTopics: () => api.get<TopicStats[]>('/quiz/topics').then(r => r.data),
 
-  getNextQuestion: (topics: string[], limit = 1) =>
+  getNextQuestion: (topics: string[], limit = 1, exclude?: number[]) =>
     api.get<QuizQuestion>('/quiz/questions/next', {
-      params: { topics: topics.join(','), limit },
+      params: { topics: topics.join(','), limit, exclude: exclude?.join(',') },
     }).then(r => r.data),
 
   submitAnswer: (req: AttemptAnswerRequest) =>

@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuizSession } from '@/hooks/use-quiz-session';
 import { SPRING_GENTLE, SPRING_SNAPPY } from '@/constants/quiz-motion';
-import type { AttemptAnswerResponse } from '@/types/quiz.types';
 
 function QuizCardScreen() {
   const { t } = useTranslation();
@@ -17,24 +16,16 @@ function QuizCardScreen() {
     isSubmitting,
     handleAnswer,
     nextQuestion,
-    loadMore,
   } = useQuizSession();
 
   const [selected, setSelected] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<AttemptAnswerResponse | null>(null);
-
-  // Auto-load more when queue is running low
-  useEffect(() => {
-    if (totalQuestions > 0 && questionIndex >= totalQuestions - 3) {
-      loadMore();
-    }
-  }, [questionIndex, totalQuestions, loadMore]);
+  const [feedback, setFeedback] = useState<{ isCorrect: boolean; correctKey: string; explanation: string } | null>(null);
 
   const onSelect = async (key: string) => {
     if (selected !== null) return;
     setSelected(key);
     const response = await handleAnswer(key);
-    if (response) setFeedback(response);
+    if (response) setFeedback({ isCorrect: response.isCorrect, correctKey: response.correctKey, explanation: response.explanation });
   };
 
   const onNext = () => {
@@ -69,14 +60,19 @@ function QuizCardScreen() {
       {/* Progress bar */}
       <div className="max-w-xl mx-auto w-full space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{t('quiz.progress', { current: questionIndex + 1, total: totalQuestions || '?' })}</span>
+          <span>
+            {t('quiz.progress', {
+              current: questionIndex + 1,
+              total: totalQuestions > 1 ? totalQuestions : '?',
+            })}
+          </span>
           <span className="text-emerald-600">✓ {correctCount}</span>
           <span className="text-red-500">✗ {wrongCount}</span>
         </div>
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-primary rounded-full"
-            animate={{ width: `${totalQuestions > 0 ? ((questionIndex + 1) / totalQuestions) * 100 : 0}%` }}
+            animate={{ width: `${totalQuestions > 1 && totalQuestions > 0 ? ((questionIndex + 1) / totalQuestions) * 100 : 0}%` }}
             transition={{ duration: 0.4 }}
           />
         </div>
@@ -191,7 +187,6 @@ function QuizSessionCompleteScreen() {
   const pct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
 
   const onReviewMissed = () => {
-    resetSession();
     navigate('/quiz/missed');
   };
 
@@ -254,8 +249,8 @@ function QuizSessionCompleteScreen() {
 export default function QuizCardPage() {
   const { isComplete, totalQuestions } = useQuizSession();
 
-  // Guard: show complete screen ONLY if the queue was populated (>=1 question loaded)
-  // and all questions have been answered. Prevents flash of "0/0 complete" on load.
+  // Guard: show complete screen only when session is complete AND
+  // at least 1 question was fetched (prevents flash on initial load).
   if (isComplete && totalQuestions > 0) {
     return <QuizSessionCompleteScreen />;
   }

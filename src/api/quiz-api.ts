@@ -6,7 +6,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('wallet_token') || localStorage.getItem('quiz_token');
+  const token = localStorage.getItem('quiz_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -15,8 +15,8 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('wallet_token');
-      localStorage.removeItem('wallet_refresh_token');
+      localStorage.removeItem('quiz_token');
+      localStorage.removeItem('quiz_refresh_token');
       window.location.href = '/login';
     }
     return Promise.reject(err);

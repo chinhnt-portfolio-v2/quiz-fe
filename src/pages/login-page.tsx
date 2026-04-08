@@ -19,15 +19,15 @@ export default function LoginPage() {
     }
 
     if (accessToken && refreshToken) {
-      localStorage.setItem('wallet_token', accessToken);
-      localStorage.setItem('wallet_refresh_token', refreshToken);
+      localStorage.setItem('quiz_token', accessToken);
+      localStorage.setItem('quiz_refresh_token', refreshToken);
       navigate('/quiz', { replace: true });
     }
   }, [searchParams, navigate]);
 
   // If already logged in, redirect to quiz
   useEffect(() => {
-    const token = localStorage.getItem('wallet_token');
+    const token = localStorage.getItem('quiz_token');
     if (token) navigate('/quiz', { replace: true });
   }, [navigate]);
 
