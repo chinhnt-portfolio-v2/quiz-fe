@@ -252,9 +252,11 @@ function QuizSessionCompleteScreen() {
 }
 
 export default function QuizCardPage() {
-  const { isComplete } = useQuizSession();
+  const { isComplete, totalQuestions } = useQuizSession();
 
-  if (isComplete) {
+  // Guard: show complete screen ONLY if the queue was populated (>=1 question loaded)
+  // and all questions have been answered. Prevents flash of "0/0 complete" on load.
+  if (isComplete && totalQuestions > 0) {
     return <QuizSessionCompleteScreen />;
   }
 
