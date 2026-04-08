@@ -56,7 +56,11 @@ export default function QuizTopicSelectionPage() {
 
         {/* Topic grid */}
         <div className="grid grid-cols-2 gap-3">
-          {topics.map(topic => (
+          {topics.length === 0 ? (
+            <div className="col-span-2 flex flex-col items-center gap-3 py-12 text-center">
+              <p className="text-muted-foreground">No topics found.</p>
+            </div>
+          ) : topics.map(topic => (
             <motion.button
               key={topic.topicSlug}
               whileTap={{ scale: 0.97 }}
