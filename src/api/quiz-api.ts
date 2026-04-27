@@ -1,8 +1,12 @@
 import axios from 'axios';
 import { setToken, getToken, clearToken } from './token-cache';
 
+// In production (Vercel), VITE_API_BASE_URL is the full backend URL.
+// In local dev, use '/api/v1' so Vite proxy handles CORS.
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'https://chinhnt-portfolio-platform.fly.dev/api/v1',
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -17,7 +21,9 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
-    if (err.response?.status === 401 && !originalRequest._retry) {
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/register');
+    if (err.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem('quiz_refresh_token');
       if (!refreshToken) {

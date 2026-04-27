@@ -12,8 +12,16 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: process.env.VITE_PROXY_TARGET ?? 'https://chinhnt-portfolio-platform.fly.dev',
         changeOrigin: true,
+        secure: true,
+        configure: (proxy) => {
+          // Remove Origin so backend CORS allows all proxied dev requests
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.removeHeader('origin');
+            proxyReq.removeHeader('referer');
+          });
+        },
       },
     },
   },

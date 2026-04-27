@@ -12,7 +12,9 @@
     "wrong": "Sai",
     "next": "Câu Tiếp Theo",
     "finish": "Kết Thúc Quiz",
-    "explanation": "Giải thích"
+    "explanation": "Giải thích",
+    "logout": "Đăng xuất",
+    "endSession": "Kết thúc phiên"
   },
   "missed": {
     "title": "Câu Hỏi Cần Ôn Tập",
@@ -26,7 +28,10 @@
     "junior": "Sơ Cấp",
     "middle": "Trung Cấp",
     "senior": "Cao Cấp",
-    "mastered": "đã thành thạo"
+    "mastered": "đã thành thạo",
+    "reset": "Xóa tiến độ",
+    "resetConfirm": "Xóa toàn bộ tiến độ của {{topic}}? Không thể hoàn tác.",
+    "history": "Lịch sử"
   },
   "level": {
     "JUNIOR": "Sơ Cấp",
@@ -40,5 +45,16 @@
     "reviewMissed": "Xem Câu Sai",
     "backToTopics": "Quay Lại"
   },
-  "streak": "Ngày Liên Tục"
+  "streak": "Ngày Liên Tục",
+  "history": {
+    "title": "Lịch sử ôn tập",
+    "filter": {
+      "topic": "Chủ đề",
+      "result": "Kết quả",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "apply": "Áp dụng"
+    },
+    "empty": "Chưa có lần thực hiện nào. Hãy bắt đầu luyện tập!"
+  }
 }

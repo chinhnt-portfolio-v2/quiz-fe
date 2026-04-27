@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTopics } from '@/hooks/use-quiz';
+import { quizApi } from '@/api/quiz';
 import { SPRING_GENTLE } from '@/constants/quiz-motion';
 
 function CoverageBar({ value, max, color }: { value: number; max: number; color: string }) {
@@ -22,6 +24,17 @@ export default function QuizProgressPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: topics, isLoading, isError } = useTopics();
+  const queryClient = useQueryClient();
+  const resetMutation = useMutation({
+    mutationFn: (topicSlug: string) => quizApi.resetProgress(topicSlug),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['quiz', 'topics'] }),
+  });
+
+  const handleReset = (topicLabel: string, topicSlug: string) => {
+    if (window.confirm(t('progress.resetConfirm', { topic: topicLabel }))) {
+      resetMutation.mutate(topicSlug);
+    }
+  };
 
   if (isLoading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -103,12 +116,25 @@ export default function QuizProgressPage() {
                 })}
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => navigate(`/quiz/history?topic=${topic.topicSlug}`)}
+                  className="btn btn-ghost btn-sm text-xs"
+                >
+                  {t('progress.history')} →
+                </button>
                 <button
                   onClick={() => navigate(`/quiz/practice?topics=${topic.topicSlug}`)}
                   className="btn btn-outline btn-sm text-xs"
                 >
                   Practice →
+                </button>
+                <button
+                  onClick={() => handleReset(topic.topicLabel, topic.topicSlug)}
+                  className="btn btn-ghost btn-sm text-xs text-red-500 hover:text-red-600"
+                  title={t('progress.reset')}
+                >
+                  🗑
                 </button>
               </div>
             </motion.div>

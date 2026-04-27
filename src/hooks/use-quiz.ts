@@ -15,10 +15,11 @@ export function useTopics() {
 
 export function useNextQuestion(topics: string[], fetchCounter = 0, exclude?: number[]) {
   return useQuery({
-    queryKey: [...QUIZ_KEYS.nextQuestion(topics), fetchCounter],
+    queryKey: [...QUIZ_KEYS.nextQuestion(topics), fetchCounter, exclude?.join(',')],
     queryFn: () => quizApi.getNextQuestion(topics, 1, exclude),
     enabled: topics.length > 0,
-    placeholderData: (prev) => prev,
+    staleTime: 0,
+    gcTime: 0,
     // 404 means backend has no more questions for this topic → end session
     retry: (failureCount, err) => {
       if (err && typeof err === 'object' && 'response' in err) {

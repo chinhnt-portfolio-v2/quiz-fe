@@ -1,7 +1,9 @@
 import { useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useQuizSessionStore } from '@/stores/quiz-session-store';
-import { useNextQuestion, useSubmitAnswer } from './use-quiz';
+import { useNextQuestion, useSubmitAnswer, QUIZ_KEYS } from './use-quiz';
+import { quizApi } from '@/api/quiz';
 
 export function useQuizSession() {
   const [searchParams] = useSearchParams();
@@ -15,6 +17,7 @@ export function useQuizSession() {
 
   // fetchCounter increments on "Next" → React Query fires a new fetch.
   // Pass answered question IDs so BE can exclude them (avoids tx-timing duplicate).
+  const qc = useQueryClient();
   const answeredIds = questionQueue.map(q => q.id);
   const { data: nextQuestionData, error: nextQuestionError, isError } = useNextQuestion(topics, fetchCounter, answeredIds);
   const submitAnswer = useSubmitAnswer();
@@ -49,8 +52,18 @@ export function useQuizSession() {
       givenKey,
     });
     recordAnswer(response);
+
+    // Prefetch next question while user reads feedback, so Next click is instant.
+    const nextExclude = [...answeredIds, currentQuestion.id];
+    const nextCounter = fetchCounter + 1;
+    qc.prefetchQuery({
+      queryKey: [...QUIZ_KEYS.nextQuestion(topics), nextCounter, nextExclude.join(',')],
+      queryFn: () => quizApi.getNextQuestion(topics, 1, nextExclude),
+      staleTime: 0,
+    });
+
     return response;
-  }, [currentQuestion, submitAnswer, recordAnswer]);
+  }, [currentQuestion, submitAnswer, recordAnswer, qc, topics, answeredIds, fetchCounter]);
 
   return {
     topics,

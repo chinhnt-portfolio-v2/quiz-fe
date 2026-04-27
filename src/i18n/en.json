@@ -12,7 +12,9 @@
     "wrong": "Incorrect",
     "next": "Next Question",
     "finish": "Finish Quiz",
-    "explanation": "Explanation"
+    "explanation": "Explanation",
+    "logout": "Logout",
+    "endSession": "End session"
   },
   "missed": {
     "title": "Questions to Review",
@@ -26,7 +28,10 @@
     "junior": "Junior",
     "middle": "Middle",
     "senior": "Senior",
-    "mastered": "mastered"
+    "mastered": "mastered",
+    "reset": "Reset progress",
+    "resetConfirm": "Reset all progress for {{topic}}? This cannot be undone.",
+    "history": "History"
   },
   "level": {
     "JUNIOR": "Junior",
@@ -40,5 +45,16 @@
     "reviewMissed": "Review Missed",
     "backToTopics": "Back to Topics"
   },
-  "streak": "Day Streak"
+  "streak": "Day Streak",
+  "history": {
+    "title": "Study History",
+    "filter": {
+      "topic": "Topic",
+      "result": "Result",
+      "from": "From date",
+      "to": "To date",
+      "apply": "Apply filters"
+    },
+    "empty": "No attempts yet. Start practicing!"
+  }
 }

@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuizSession } from '@/hooks/use-quiz-session';
+import { clearToken } from '@/api/token-cache';
 import { SPRING_GENTLE, SPRING_SNAPPY } from '@/constants/quiz-motion';
 
 function QuizCardScreen() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     currentQuestion,
     questionIndex,
@@ -16,6 +18,7 @@ function QuizCardScreen() {
     isSubmitting,
     handleAnswer,
     nextQuestion,
+    resetSession,
   } = useQuizSession();
 
   const [selected, setSelected] = useState<string | null>(null);
@@ -55,6 +58,19 @@ function QuizCardScreen() {
     return 'border-border bg-muted/30 opacity-60 cursor-not-allowed';
   };
 
+  const onLogout = () => {
+    localStorage.removeItem('quiz_token');
+    localStorage.removeItem('quiz_refresh_token');
+    clearToken();
+    navigate('/login');
+  };
+
+  const onEndSession = () => {
+    if (!confirm(t('quiz.endSession') + '?')) return;
+    resetSession();
+    navigate('/quiz');
+  };
+
   return (
     <div className="min-h-screen bg-background px-4 py-6 flex flex-col">
       {/* Progress bar */}
@@ -75,6 +91,32 @@ function QuizCardScreen() {
             animate={{ width: `${totalQuestions > 1 && totalQuestions > 0 ? ((questionIndex + 1) / totalQuestions) * 100 : 0}%` }}
             transition={{ duration: 0.4 }}
           />
+        </div>
+        {/* Header action buttons */}
+        <div className="flex justify-end gap-2 pt-1">
+          <button
+            onClick={onEndSession}
+            title={t('quiz.endSession')}
+            className="btn btn-ghost btn-sm text-muted-foreground hover:text-foreground"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+              <line x1="12" y1="2" x2="12" y2="12"/>
+            </svg>
+            <span className="sr-only">{t('quiz.endSession')}</span>
+          </button>
+          <button
+            onClick={onLogout}
+            title={t('quiz.logout')}
+            className="btn btn-ghost btn-sm text-muted-foreground hover:text-foreground"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span className="sr-only">{t('quiz.logout')}</span>
+          </button>
         </div>
       </div>
 
@@ -109,7 +151,7 @@ function QuizCardScreen() {
 
             {/* Options */}
             <div className="space-y-3">
-              {currentQuestion.options.map((opt) => (
+              {currentQuestion.options.map((opt, idx) => (
                 <motion.button
                   key={opt.id}
                   whileTap={selected ? {} : { scale: 0.98 }}
@@ -125,7 +167,7 @@ function QuizCardScreen() {
                     flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-semibold
                     ${selected === opt.id ? 'border-primary bg-primary text-white' : 'border-current'}
                   `}>
-                    {opt.text[0]?.toUpperCase()}
+                    {String.fromCharCode(65 + idx)}
                   </span>
                   <span className="text-sm leading-snug">{opt.text}</span>
                 </motion.button>

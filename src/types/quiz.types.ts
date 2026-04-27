@@ -80,3 +80,37 @@ export interface SeedStatus {
   topicCount: number;
   questionCount: number;
 }
+
+export interface AttemptHistoryItem {
+  questionId: number;
+  topicSlug: string;
+  levelTag: QuizLevel;
+  questionText: string;
+  givenKey: string;
+  correctKey: string;
+  isCorrect: boolean;
+  responseMs: number;
+  attemptedAt: string;
+}
+
+export interface AttemptHistoryPage {
+  content: AttemptHistoryItem[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
+export interface AttemptHistoryFilters {
+  topic?: string;
+  isCorrect?: boolean;
+  from?: string;
+  to?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken?: string;
+}
